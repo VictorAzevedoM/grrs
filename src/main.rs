@@ -1,4 +1,5 @@
 use structopt::StructOpt;
+use anyhow::{Context, Result};
 #[derive(StructOpt)]
 struct Cli{
     pattern: String,
@@ -6,15 +7,15 @@ struct Cli{
     path: std::path::PathBuf,
 }
 
-fn main() {
+
+fn main()-> Result<()>  {
     let args = Cli::from_args();
     let content = std::fs::read_to_string(&args.path)
-    .expect("could not read file");
+    .with_context(|| format!("could not read file `{}`", args.path.display()))?;
     for line in content.lines() {
         if line.contains(&args.pattern) {
             println!("{}", line);
         }
     }
-    
-
+    Ok(())
 }
